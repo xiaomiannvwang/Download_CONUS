@@ -112,11 +112,9 @@ if __name__ == '__main__':
                 print("start multiprocessing...")
                 #pool = mp.Pool(4)
                 with mp.Pool(4) as pool:
-                    results = list(tqdm(pool.starmap(getParaFile, zip(repeat(parameter), day_url_list, para_dir_path_list), total=len(para_dir_path_list))))
-                print('get already the download links and directory:)')
-                for x in range(len((results))):
-                    print(results[x][0], '\t', results[x][1])
-                    print("work still....")
+                    results = pool.starmap(getParaFile, zip(repeat(parameter), day_url_list, para_dir_path_list))
+                    print('get already the download links and directory: and )print it out')
+                    print(results)
                     #results[x][0]
                     #results[x][1]
                     # p = mp.Process(target=Download, args=(results[x][0], results[x][1]))
