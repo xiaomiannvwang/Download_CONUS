@@ -65,7 +65,7 @@ def getParaFile(para, url, para_dir_path):
         else:
             continue
     end_time = time.time()
-    logger.info('it takes {} to download the month files for one para.'.format(end_time-start_time))    
+    logger.info('it takes {} to download the month files for one para.'.format(end_time-))    
     logger.info('move to another month!')        
 
 if __name__ == '__main__':
@@ -101,12 +101,13 @@ if __name__ == '__main__':
         CheckDir(year_path)
         logger.info('year folders exist!')
         url_year_list = getYear(url, year)
-        for month_url in url_year_list:
-            month_day_list = getMonth(month_url)
-            for para in Para_list:
-                para_folder_path = os.path.join(year_path, para)
-                CheckDir(para_folder_path)
-                logger.info('para folder exists!')
+        for para in Para_list:
+            para_folder_path = os.path.join(year_path, para)
+            CheckDir(para_folder_path)
+            logger.info('para folder exists!')
+            logger.info('start with para {} in month'.format(para))
+            for month_url in url_year_list:
+                month_day_list = getMonth(month_url)
                 logger.info("start multiprocessing...")
                 with mp.Pool(cores) as pool:
                     logger.info("start downloadding files for one month:")
