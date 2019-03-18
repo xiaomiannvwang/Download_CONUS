@@ -97,12 +97,15 @@ if __name__ == '__main__':
                 CheckDir(para_folder_path)
                 logger.info('para folder exists!')
                 logger.info("start multiprocessing...")
-                p_download = [mp.Process(target=getParaFile, args=(para, month_day_list[i], para_folder_path), 20) for i in range(len(month_day_list))]               
-                logger.info("start downloadding...")
-                for p in p_download:
-                    p.start()
-                for p in p_download:
-                    p.join()
+                with mp.Pool(cores) as pool:
+                    logger.info("start downloadding...")
+                    pool.starmap(getParaFile, zip(repeat(para), month_day_list, repeat(para_folder_path)), 20)
+                #p_download = [mp.Process(target=getParaFile, args=(para, month_day_list[i], para_folder_path), 20) for i in range(len(month_day_list))]               
+                
+                # for p in p_download:
+                #     p.start()
+                # for p in p_download:
+                #     p.join()
                         
 
                 
