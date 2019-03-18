@@ -47,16 +47,14 @@ def getParaFile(para, url, para_dir_path):
         if j['href'][:6] == para:
             file_url = url + j['href']
             file_path_name = para_dir_path + '/' + j['href'] + '.dms'
-            file_url_list.appand(file_url)
-            file_path_name_list.append(file_path_name)
-    #time.sleep(random.random() * 3)\
+            downloadfile = URLopener()
+            downloadfile.retrieve(file_url, file_path_name)
     time.sleep(1)
-    return file_url_list, file_path_name_list
+    print('file {} has been downloaded!'.format(j['href']))
             
 #download the file            
 def Download(file_url, file_path_name):
-    downloadfile = URLopener()
-    downloadfile.retrieve(file_url, file_path_name)
+    
 
 if __name__ == '__main__':
     #path2save = Path('/Volumes/Elements/Download_2.5km_folder_muster_umfolder/')
@@ -81,19 +79,16 @@ if __name__ == '__main__':
                 para_folder_path = os.path.join(year_path, para)
                 CheckDir(para_folder_path)
                 print('para folder exists!')
-                with mp.Pool(cores) as pool:
-                    print("start multiprocessing...")
-                    download_urls = pool.starmap(getParaFile, zip(repeat(para), month_day_list, repeat(para_folder_path)))
-                print('print the results:')
-                for res in download_urls:
-                    print(res[0], res[1])
-                
-                # p_download = [mp.Process(target=Download, args=(download_urls[i][0], download_urls[i][1])) for i in range(len(download_urls[0]))]               
-                # for p in p_download:
-                #     p.start()
-                # for p in p_download:
-                #     p.join()
+                print("start multiprocessing...")
+                p_download = [mp.Process(target=getParaFile, args=(para, month_day_list[i], para_folder_path)) for i in range(len(month_day_list))]               
+                for p in p_download:
+                    p.start()
+                for p in p_download:
+                    p.join()
                         
+
+                
+                
 
 
 
