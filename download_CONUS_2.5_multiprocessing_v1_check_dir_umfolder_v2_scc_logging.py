@@ -9,7 +9,13 @@ from tqdm import tqdm
 import time 
 from pathlib import Path
 import logging
-
+def initFile(file_path):
+    if os.path.isfile(file_path):
+        os.remove(file_path)
+        # os.mknod requires root
+        #os.mknod(file_path)
+    open(file_path, 'a').close()
+    
 def CheckDir(dir_path):
     if not os.path.isdir(dir_path):
         logger.debug("{} not exists!".format(dir_path))
