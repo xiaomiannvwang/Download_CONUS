@@ -127,7 +127,6 @@ if __name__ == '__main__':
                             mp.Pool(cores).starmap_async(download, zip(file_url_list, file_path_name_list), callback=update) 
     except:
         logger.debug("show what happening...")
-        break
                 
                 
 
