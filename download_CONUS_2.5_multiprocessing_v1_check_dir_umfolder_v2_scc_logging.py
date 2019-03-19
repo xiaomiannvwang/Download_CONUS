@@ -50,6 +50,7 @@ def getMonth(url):
     return day_url_list
 
 def getParaFile(para, url, para_dir_path):
+    logger.info("start download day files {}".format(url[-8:]))
     start_time = time.time()
     content = urlopen(url).read()
     soup_new = BeautifulSoup(content, features="lxml")
@@ -59,14 +60,16 @@ def getParaFile(para, url, para_dir_path):
         if j['href'][:6] == para:
             file_url = url + j['href']
             file_path_name = para_dir_path + '/' + j['href'] + '.dms'
-            downloadfile = URLopener()
-            downloadfile.retrieve(file_url, file_path_name)
-            logger.info('file {} is downloaded:)'.format(j['href']))
-        else:
-            continue
+            if not os.path.isfile(file_path_name):
+                downloadfile = URLopener()
+                downloadfile.retrieve(file_url, file_path_name)
+                logger.info('file {} is downloaded:)'.format(j['href']))
+            else: 
+                logger.debug('file {} already exists.'.format(j['href']))
     end_time = time.time()
-    logger.info('it takes {} to download the month files for one para.'.format(end_time-))    
-    logger.info('move to another month!')        
+    logger.info('it takes {:.2f} min to download the month files for '.format(end_time-start_time)/60))   
+    logger.info('move to another month!') 
+           
 
 if __name__ == '__main__':
     logfile_path = '/pfs/work6/workspace/scratch/ov0392-CONUS2.5-0/Download_2.5km_folder_muster_umfolder/CONUS_2.5_Download_v2.log'
@@ -105,20 +108,13 @@ if __name__ == '__main__':
             para_folder_path = os.path.join(year_path, para)
             CheckDir(para_folder_path)
             logger.info('para folder exists!')
-            logger.info('start with para {} in month'.format(para))
+            logger.info('start with para {}.'.format(para))
             for month_url in url_year_list:
                 month_day_list = getMonth(month_url)
                 logger.info("start multiprocessing...")
-                with mp.Pool(cores) as pool:
-                    logger.info("start downloadding files for one month:")
-                    pool.starmap(getParaFile, zip(repeat(para), month_day_list, repeat(para_folder_path)))
-                #p_download = [mp.Process(target=getParaFile, args=(para, month_day_list[i], para_folder_path), 20) for i in range(len(month_day_list))]               
-                
-                # for p in p_download:
-                #     p.start()
-                # for p in p_download:
-                #     p.join()
-                        
+                # with mp.Pool(cores) as pool:
+                mp.Pool(cores).starmap_async(getParaFile, zip(repeat(para), month_day_list, repeat(para_folder_path)))
+               
 
                 
                 
