@@ -50,7 +50,7 @@ def getMonth(url):
     return day_url_list
 
 def getParaFile(para, url, para_dir_path):
-    logger.info("start download day files {}".format(url[-8:]))
+    logger.info("start download day files {}".format(url[-9:]))
     start_time = time.time()
     content = urlopen(url).read()
     soup_new = BeautifulSoup(content, features="lxml")
@@ -67,7 +67,7 @@ def getParaFile(para, url, para_dir_path):
             else: 
                 logger.debug('file {} already exists.'.format(j['href']))
     end_time = time.time()
-    logger.info('it takes {:.2f} min to download the month files for '.format(end_time-start_time)/60))   
+    logger.info('it takes {:.2f} min to download the month files for '.format((end_time-start_time)/60))   
     logger.info('move to another month!') 
            
 
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     CheckDir(path2save)
     url = "https://nomads.ncdc.noaa.gov/data/ndfd/"
     #give the wanted year data
-    year_list = ['2015', '2016']
+    year_list = ['2015']
     #seperate run because the low speed. in order: ['YBUZ98', 'YCUZ98', 'YEUZ98']
     Para_list = ['YBUZ98', 'YCUZ98', 'YEUZ98']
     #multiprocessing pool
@@ -112,10 +112,9 @@ if __name__ == '__main__':
             for month_url in url_year_list:
                 month_day_list = getMonth(month_url)
                 logger.info("start multiprocessing...")
-                # with mp.Pool(cores) as pool:
-                mp.Pool(cores).starmap_async(getParaFile, zip(repeat(para), month_day_list, repeat(para_folder_path)))
+                with mp.Pool(cores) as pool:
+		    pool.starmap_async(getParaFile, zip(repeat(para), month_day_list, repeat(para_folder_path)))
                
-
                 
                 
 
