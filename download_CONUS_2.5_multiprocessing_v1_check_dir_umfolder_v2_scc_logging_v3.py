@@ -50,8 +50,6 @@ def getMonth(url):
     return day_url_list
 
 def getParaFile(para, url, para_dir_path):
-    logger.info("start download day files {}".format(url[-9:]))
-    start_time = time.time()
     content = urlopen(url).read()
     soup_new = BeautifulSoup(content, features="lxml")
     file_url_list = []
@@ -61,16 +59,25 @@ def getParaFile(para, url, para_dir_path):
             file_url = url + j['href']
             file_path_name = para_dir_path + '/' + j['href'] + '.dms'
             if not os.path.isfile(file_path_name):
-                downloadfile = URLopener()
-                downloadfile.retrieve(file_url, file_path_name)
-                logger.info('file {} is downloaded:)'.format(j['href']))
+                file_url_list.append(file_url)
+                file_path_name_list.append(file_path_name_list)
             else: 
                 logger.debug('file {} already exists.'.format(j['href']))
+    return file_url_list, file_path_name_list
+
+def download(file_url, file_path_name):
+    logger.info("start download day files {}".format(url[-9:]))
+    start_time = time.time()
+    downloadfile = URLopener()
+    downloadfile.retrieve(file_url, file_path_name)
+    logger.info('file {} is downloaded:)'.format(j['href']))
     end_time = time.time()
     time.sleep(1)
-    logger.info('it takes {:.2f} min to download the month files for.'.format((end_time-start_time)/60))   
-    logger.info('move to another month!') 
-           
+    logger.info('it takes {:.2f} min to download this files.'.format((end_time-start_time)/60))   
+    logger.info('move on to another file!') 
+
+def update(*a):
+    return pbar.update()
 
 if __name__ == '__main__':
     logfile_path = '/pfs/work6/workspace/scratch/ov0392-CONUS2.5-0/Download_2.5km_folder_muster_umfolder/CONUS_2.5_Download_v2.log'
@@ -94,7 +101,7 @@ if __name__ == '__main__':
     CheckDir(path2save)
     url = "https://nomads.ncdc.noaa.gov/data/ndfd/"
     #give the wanted year data
-    year_list = ['2015', '2016']
+    year_list = ['2015']
     #seperate run because the low speed. in order: ['YBUZ98', 'YCUZ98', 'YEUZ98']
     Para_list = ['YBUZ98', 'YCUZ98', 'YEUZ98']
     #multiprocessing pool
@@ -112,11 +119,14 @@ if __name__ == '__main__':
                 logger.info('start with para {}.'.format(para))
                 for month_url in url_year_list:
                     month_day_list = getMonth(month_url)
-                    logger.info("start multiprocessing...")
-                    with mp.Pool(cores) as pool:
-                        pool.starmap(getParaFile, zip(repeat(para), month_day_list, repeat(para_folder_path)))
-    
+                    for day_url in month_day_list:
+                        file_url_list, file_path_name_list = getParaFile(para, day_url, para_folder_path)
+                        logger.info("start multiprocessing...")
+                        pbar = tadm(total = len(file_url_list))
+                        for i in range(len(file_url_list)):
+                            mp.Pool(cores).starmap_async(download, zip(file_url_list, file_path_name_list), callback=update) 
     except:
+        logger.debug("show what happening...")
         break
                 
                 
