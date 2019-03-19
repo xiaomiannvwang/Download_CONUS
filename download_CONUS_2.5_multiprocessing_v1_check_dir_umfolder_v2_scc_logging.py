@@ -67,8 +67,12 @@ def getParaFile(para, url, para_dir_path):
             else: 
                 logger.debug('file {} already exists.'.format(j['href']))
     end_time = time.time()
+<<<<<<< HEAD
     time.sleep(1)
     logger.info('it takes {:.2f} min to download the month files for.'.format((end_time-start_time)/60))   
+=======
+    logger.info('it takes {:.2f} min to download the month files for '.format((end_time-start_time)/60))   
+>>>>>>> d4f474b271b4350d6cd28989591dd1fdc19969d9
     logger.info('move to another month!') 
            
 
@@ -94,11 +98,12 @@ if __name__ == '__main__':
     CheckDir(path2save)
     url = "https://nomads.ncdc.noaa.gov/data/ndfd/"
     #give the wanted year data
-    year_list = ['2015', '2016']
+    year_list = ['2015']
     #seperate run because the low speed. in order: ['YBUZ98', 'YCUZ98', 'YEUZ98']
     Para_list = ['YBUZ98', 'YCUZ98', 'YEUZ98']
     #multiprocessing pool
     cores = multiprocessing.cpu_count()
+<<<<<<< HEAD
     try:
         for year in year_list:
             year_path = os.path.join(path2save, year)
@@ -118,6 +123,25 @@ if __name__ == '__main__':
     
     except:
         break
+=======
+
+    for year in year_list:
+        year_path = os.path.join(path2save, year)
+        CheckDir(year_path)
+        logger.info('year folders exist!')
+        url_year_list = getYear(url, year)
+        for para in Para_list:
+            para_folder_path = os.path.join(year_path, para)
+            CheckDir(para_folder_path)
+            logger.info('para folder exists!')
+            logger.info('start with para {}.'.format(para))
+            for month_url in url_year_list:
+                month_day_list = getMonth(month_url)
+                logger.info("start multiprocessing...")
+                with mp.Pool(cores) as pool:
+		    pool.starmap_async(getParaFile, zip(repeat(para), month_day_list, repeat(para_folder_path)))
+               
+>>>>>>> d4f474b271b4350d6cd28989591dd1fdc19969d9
                 
                 
 
